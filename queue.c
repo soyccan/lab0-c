@@ -148,7 +148,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
  * Return number of elements in queue.
  * Return 0 if q is NULL or empty
  */
-size_t q_size(queue_t *q)
+int q_size(queue_t *q)
 {
     if (q == NULL || q->head == NULL)
         return 0;

@@ -29,11 +29,14 @@ OBJS := qtest.o report.o console.o harness.o queue.o \
         random.o dudect/constant.o dudect/fixture.o dudect/ttest.o
 deps := $(OBJS:%.o=.%.o.d)
 
+.PHONY: qtest $(OBJS)
+
 qtest: $(OBJS)
 	$(VECHO) "  LD\t$@\n"
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^ -lm
 
-%.o: %.c
+# https://www.gnu.org/software/make/manual/html_node/Static-Usage.html
+$(OBJS): %.o: %.c
 	@mkdir -p .$(DUT_DIR)
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
@@ -56,7 +59,7 @@ valgrind: valgrind_existence
 	sed -i "s/alarm/isnan/g" $(patched_file)
 	scripts/driver.py -p $(patched_file) --valgrind
 	@echo
-	@echo "Test with specific case by running command:" 
+	@echo "Test with specific case by running command:"
 	@echo "scripts/driver.py -p $(patched_file) --valgrind -t <tid>"
 
 clean:

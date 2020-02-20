@@ -26,7 +26,7 @@ typedef struct ELE {
 typedef struct {
     list_ele_t *head; /* Linked list of elements */
     list_ele_t *tail;
-    size_t size;
+    int size;
 } queue_t;
 
 /* Operations on queue */
@@ -75,7 +75,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize);
  * Return number of elements in queue.
  * Return 0 if q is NULL or empty
  */
-size_t q_size(queue_t *q);
+int q_size(queue_t *q);
 
 /*
  * Reverse elements in queue
