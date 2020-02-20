@@ -1,5 +1,6 @@
 #include "queue.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -178,10 +179,8 @@ void q_reverse(queue_t *q)
     q->head = pe;
 }
 
-static int __cmp_list_ele(const void *a, const void *b)
+static inline int __cmp_list_ele(const list_ele_t *x, const list_ele_t *y)
 {
-    const list_ele_t *x = *(list_ele_t **) a;
-    const list_ele_t *y = *(list_ele_t **) b;
     if (x->value == NULL || y->value == NULL) {
         if (x->value == NULL && y->value == NULL)
             return 0;
@@ -191,6 +190,40 @@ static int __cmp_list_ele(const void *a, const void *b)
             return 1;
     }
     return strcmp(x->value, y->value);
+}
+
+static list_ele_t *__mergesort(list_ele_t *l)
+{
+    if (l == NULL || l->next == NULL)
+        return l;
+
+    list_ele_t *slow = l;
+    list_ele_t *fast = l->next;  // Note: what if fast = l ?
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    list_ele_t *t = slow->next;
+    slow->next = NULL;
+
+    l = __mergesort(l);
+    t = __mergesort(t);
+
+    list_ele_t _nl;
+    list_ele_t *nl = &_nl;
+    while (l != NULL || t != NULL) {
+        if (t == NULL || (l != NULL && __cmp_list_ele(l, t) <= 0)) {
+            nl->next = l;
+            nl = l;
+            l = l->next;
+        } else {
+            nl->next = t;
+            nl = t;
+            t = t->next;
+        }
+    }
+    nl->next = NULL;
+    return _nl.next;
 }
 
 /*
@@ -203,38 +236,5 @@ void q_sort(queue_t *q)
     if (q == NULL || q->head == NULL || q->head == q->tail)
         return;
 
-    for (size_t i = q->size - 2; i <= q->size - 2;
-         --i) {  // Note: unsigned compare
-        bool relax = false;
-        list_ele_t *pe = NULL;
-        list_ele_t *e = q->head;
-        list_ele_t *ne, *nne;
-        for (size_t j = 0; j <= i; ++j) {
-            ne = e->next;
-            nne = ne->next;
-            if (__cmp_list_ele(&e, &ne) > 0) {
-                relax = true;
-
-                if (ne == q->tail)
-                    // Note: remember to maintain tail
-                    q->tail = e;
-
-                if (pe != NULL)
-                    pe->next = ne;
-                else
-                    q->head = ne;
-                ne->next = e;
-                e->next = nne;
-
-                // Note: remember to swap e, ne; otherwise fail on testcase 05
-                list_ele_t *t = e;
-                e = ne;
-                ne = t;
-            }
-            pe = e;
-            e = ne;
-        }
-        if (!relax)
-            break;
-    }
+    q->head = __mergesort(q->head);
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import subprocess
 import sys
@@ -74,7 +74,7 @@ class Tracer:
             return False
         fname = "%s/%s.cmd" % (self.traceDirectory, self.traceDict[tid])
         vname = "%d" % self.verbLevel
-        clist = [self.command, self.qtest, "-v", vname, "-f", fname]
+        clist = [self.command, "-v", vname, "-f", fname]
         try:
             retcode = subprocess.call(clist)
         except Exception as e:
