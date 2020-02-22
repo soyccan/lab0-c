@@ -31,9 +31,12 @@ deps := $(OBJS:%.o=.%.o.d)
 
 .PHONY: qtest $(OBJS)
 
-qtest: $(OBJS)
+qtest: $(OBJS) natsort/strnatcmp.o
 	$(VECHO) "  LD\t$@\n"
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^ -lm
+
+natsort/strnatcmp.o:
+	$(MAKE) -C natsort
 
 # https://www.gnu.org/software/make/manual/html_node/Static-Usage.html
 $(OBJS): %.o: %.c
@@ -67,5 +70,6 @@ clean:
 	rm -rf .$(DUT_DIR)
 	rm -rf *.dSYM
 	(cd traces; rm -f *~)
+	$(MAKE) -C natsort clean
 
 -include $(deps)

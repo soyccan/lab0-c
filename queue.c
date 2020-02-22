@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "harness.h"
+#include "natsort/strnatcmp.h"
 
 /*
  * Create empty queue.
@@ -185,11 +186,11 @@ static inline int __cmp_list_ele(const list_ele_t *x, const list_ele_t *y)
         if (x->value == NULL && y->value == NULL)
             return 0;
         else if (x->value == NULL)
-            return -1;
-        else
             return 1;
+        else
+            return -1;
     }
-    return strcmp(x->value, y->value);
+    return strnatcasecmp(x->value, y->value);
 }
 
 static list_ele_t *__mergesort(list_ele_t *l)
