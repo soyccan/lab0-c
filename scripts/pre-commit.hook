@@ -3,7 +3,7 @@
 CPPCHECK_suppresses="--inline-suppr harness.c --suppress=unmatchedSuppression:harness.c --suppress=missingIncludeSystem"
 CPPCHECK_OPTS="-I. --enable=all --error-exitcode=1 --force $CPPCHECK_suppresses ."
 # exclude dir
-CPPCHECK_OPTS="${CPPCHECK_OPTS} -i natsort"
+CPPCHECK_OPTS="${CPPCHECK_OPTS} -i natsort -i linenoise"
 
 RETURN=0
 CLANG_FORMAT=$(which clang-format)

@@ -1,3 +1,6 @@
 [submodule "natsort"]
 	path = natsort
 	url = https://github.com/sourcefrog/natsort
+[submodule "linenoise"]
+	path = linenoise
+	url = https://github.com/antirez/linenoise
