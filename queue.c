@@ -56,16 +56,15 @@ bool q_insert_head(queue_t *q, const char *s)
     if (newh == NULL)
         return false;
 
-    size_t sl = strlen(s);
-    newh->value = malloc(sl + 1);
+    // Do not use strncpy as safer strcpy: http://blog.haipo.me/?p=1065
+    // strlcpy may be considered
+    newh->value = strdup(s);
     if (newh->value == NULL) {
         // Note: remember to free newh
         // fail on test 11
         free(newh);
         return false;
     }
-    strncpy(newh->value, s, sl);
-    newh->value[sl] = '\0';
 
     newh->next = q->head;
     q->head = newh;
@@ -91,16 +90,13 @@ bool q_insert_tail(queue_t *q, const char *s)
     if (newh == NULL)
         return false;
 
-    size_t sl = strlen(s);
-    newh->value = malloc(sl + 1);
+    newh->value = strdup(s);
     if (newh->value == NULL) {
         // Note: remember to free newh
         // fail on test 11
         free(newh);
         return false;
     }
-    strncpy(newh->value, s, sl);
-    newh->value[sl] = '\0';
 
     newh->next = NULL;
     if (q->head == NULL)
@@ -193,23 +189,8 @@ static inline int __cmp_list_ele(const list_ele_t *x, const list_ele_t *y)
     return strnatcasecmp(x->value, y->value);
 }
 
-static list_ele_t *__mergesort(list_ele_t *l)
+static inline list_ele_t *__merge(list_ele_t *l, list_ele_t *t)
 {
-    if (l == NULL || l->next == NULL)
-        return l;
-
-    list_ele_t *slow = l;
-    list_ele_t *fast = l->next;  // Note: what if fast = l ?
-    while (fast != NULL && fast->next != NULL) {
-        slow = slow->next;
-        fast = fast->next->next;
-    }
-    list_ele_t *t = slow->next;
-    slow->next = NULL;
-
-    l = __mergesort(l);
-    t = __mergesort(t);
-
     list_ele_t _nl;
     list_ele_t *nl = &_nl;
     while (l != NULL || t != NULL) {
@@ -227,6 +208,82 @@ static list_ele_t *__mergesort(list_ele_t *l)
     return _nl.next;
 }
 
+static list_ele_t *__mergesort(list_ele_t *l)
+{
+    if (l == NULL || l->next == NULL)
+        return l;
+
+    // half the list
+    // Floyd's Algorithm ( Tortoise and Hare Algorithm )
+    // http://www.csie.ntnu.edu.tw/~u91029/Function.html#4
+    list_ele_t *slow = l;
+    list_ele_t *fast = l->next;  // TODO: what if fast = l ?
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    list_ele_t *t = slow->next;
+    slow->next = NULL;
+
+    l = __mergesort(l);
+    t = __mergesort(t);
+
+    return __merge(l, t);
+}
+
+/* Algorithm:
+ * https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation_using_lists
+ */
+static inline list_ele_t *__mergesort_bottomup(list_ele_t *head)
+{
+#define _SHOW_LIST(head)                      \
+    {                                         \
+        typeof(head) h = head;                \
+        fprintf(stderr, "[");                 \
+        while (h) {                           \
+            fprintf(stderr, "%s ", h->value); \
+            h = h->next;                      \
+        }                                     \
+        fprintf(stderr, "]\n");               \
+    }
+#define _SHOW_ARR()                           \
+    for (int i = 0; i < 32; i++) {            \
+        if (arr[i]) {                         \
+            fprintf(stderr, "arr[%d] = ", i); \
+            _SHOW_LIST(arr[i]);               \
+        }                                     \
+    }
+
+    // assert: MAX_QUEUE_SIZE <= 2^(len(arr)-1)
+    // arr[i] stores merged sub-list of size 2^i
+    static list_ele_t *arr[32];
+    for (int i = 0; i < 32; i++)
+        arr[i] = NULL;
+
+    list_ele_t *result = head;
+    while (result != NULL) {
+        list_ele_t *next = result->next;
+        result->next = NULL;
+        int i;
+        for (i = 0; i < 32 && arr[i] != NULL; i++) {
+            result = __merge(result, arr[i]);
+            arr[i] = NULL;
+        }
+        if (i == 32)
+            i--;
+        assert(arr[i] == NULL);
+        arr[i] = result;
+        result = next;
+    }
+    for (int i = 0; i < 32; i++) {
+        if (arr[i] != NULL) {
+            result = __merge(result, arr[i]);
+        }
+    }
+    return result;
+#undef _SHOW_LIST
+}
+
 /*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
@@ -237,5 +294,5 @@ void q_sort(queue_t *q)
     if (q == NULL || q->head == NULL || q->head == q->tail)
         return;
 
-    q->head = __mergesort(q->head);
+    q->head = __mergesort_bottomup(q->head);
 }

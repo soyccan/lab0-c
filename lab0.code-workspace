@@ -1,0 +1,48 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"harness.h": "c",
+			"algorithm": "c",
+			"__hash_table": "cpp",
+			"__locale": "cpp",
+			"__split_buffer": "cpp",
+			"array": "cpp",
+			"bitset": "cpp",
+			"cstdio": "cpp",
+			"cstdlib": "cpp",
+			"deque": "cpp",
+			"filesystem": "cpp",
+			"functional": "cpp",
+			"memory_resource": "cpp",
+			"initializer_list": "cpp",
+			"iomanip": "cpp",
+			"istream": "cpp",
+			"iterator": "cpp",
+			"locale": "cpp",
+			"memory": "cpp",
+			"new": "cpp",
+			"ostream": "cpp",
+			"queue": "cpp",
+			"random": "cpp",
+			"sstream": "cpp",
+			"stack": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"unordered_map": "cpp",
+			"utility": "cpp",
+			"vector": "cpp",
+			"atomic": "cpp",
+			"bit": "cpp",
+			"*.tcc": "cpp",
+			"fstream": "cpp",
+			"stdexcept": "cpp",
+			"tuple": "cpp",
+			"type_traits": "cpp"
+		}
+	}
+}

@@ -11,6 +11,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/* since queue_t::size is int type */
+#define MAX_QUEUE_SIZE 2147483647
+
 /* Data structure declarations */
 
 /* Linked list element (You shouldn't need to change this) */

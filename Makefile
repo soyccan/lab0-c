@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O1 -g -Wall -Wconversion -Idudect -I.
+CFLAGS = -O1 -g -Wall -Wextra -Wconversion -Idudect -I.
 
 GIT_HOOKS := .git/hooks/applied
 DUT_DIR := dudect
@@ -29,7 +29,7 @@ OBJS := qtest.o report.o console.o harness.o queue.o \
         random.o dudect/constant.o dudect/fixture.o dudect/ttest.o
 deps := $(OBJS:%.o=.%.o.d)
 
-.PHONY: qtest $(OBJS)
+.PHONY: qtest queue.o
 
 qtest: $(OBJS) natsort/strnatcmp.o
 	$(VECHO) "  LD\t$@\n"
